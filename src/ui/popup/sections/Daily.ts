@@ -1,39 +1,44 @@
 import { DateTime } from 'luxon';
+import { LocalSampleProvider } from '../../../quran/providers';
 import { getMessage } from '../../../lib/i18n';
-import template from './Daily.html?raw';
 
-
-const messages = [
-  'Actions are judged by intentions. (Bukhari)',
-  'The best of you are those who learn the Quran and teach it. (Bukhari)',
-  'Smiling at your brother is charity.',
-  'Make things easy and do not make them difficult.',
-  'Allah does not burden a soul beyond that it can bear.',
-  'Be in this world as a stranger or a traveler.',
-  'The strong person is the one who controls himself when angry.',
-  'Seek knowledge from cradle to grave.',
-  'Kindness is a mark of faith.',
-  'Trust in Allah but tie your camel.'
-];
-
-let offset = 0;
+const provider = new LocalSampleProvider();
 
 /**
- * Shows a daily rotating inspirational message.
+ * Renders a Daily Quran card showing one ayah.
  */
-export function render(container: HTMLElement): void {
-  container.innerHTML = template;
-  const msgEl = container.querySelector('#daily-message') as HTMLDivElement;
-  const btn = container.querySelector('#daily-next') as HTMLButtonElement;
-  btn.textContent = getMessage('daily_next');
-  function show() {
-    const index = (DateTime.now().ordinal + offset) % messages.length;
-    msgEl.textContent = messages[index];
-  }
+export async function render(): Promise<HTMLElement> {
+  const card = document.createElement('div');
+  card.className = 'card';
+  const header = document.createElement('div');
+  header.className = 'card-header';
+  const left = document.createElement('div');
+  left.className = 'left';
+  const icon = document.createElement('span');
+  icon.textContent = '📖';
+  const title = document.createElement('span');
+  title.textContent = getMessage('daily_quran');
+  left.appendChild(icon);
+  left.appendChild(title);
+  header.appendChild(left);
+  card.appendChild(header);
 
-  btn.onclick = () => {
-    offset++;
-    show();
-  };
-  show();
+  const body = document.createElement('div');
+  const surah = await provider.getSurah(1);
+  const index = DateTime.now().ordinal % surah.ayat.length;
+  const ayah = surah.ayat[index];
+  const ar = document.createElement('div');
+  ar.className = 'quran-ar';
+  ar.textContent = ayah.ar;
+  const en = document.createElement('div');
+  en.className = 'quran-en';
+  en.textContent = ayah.en;
+  const ref = document.createElement('div');
+  ref.className = 'quran-ref';
+  ref.textContent = `Quran 1:${ayah.number} (Al-Fatiha)`;
+  body.appendChild(ar);
+  body.appendChild(en);
+  body.appendChild(ref);
+  card.appendChild(body);
+  return card;
 }

@@ -40,5 +40,18 @@
   "opt_adhan_custom_url": { "message": "Пользовательский URL" },
   "opt_custom": { "message": "Пользовательский" },
   "opt_adhan_src_makkah": { "message": "Мекка" },
-  "opt_adhan_src_medina": { "message": "Медина" }
+  "opt_adhan_src_medina": { "message": "Медина" },
+  "prayer_fajr": { "message": "Fajr" },
+  "prayer_dhuhr": { "message": "Dhuhr" },
+  "prayer_asr": { "message": "Asr" },
+  "prayer_maghrib": { "message": "Maghrib" },
+  "prayer_isha": { "message": "Isha" },
+  "daily_quran": { "message": "Daily Quran" },
+  "religious_news": { "message": "Religious news" },
+  "nav_prev": { "message": "Previous" },
+  "nav_next": { "message": "Next" },
+  "live_from_makkah": { "message": "Live from Makkah" },
+  "no_live_stream": { "message": "No live stream configured" },
+  "community": { "message": "Community" },
+  "prayer_intentions": { "message": "Prayer intentions" }
 }
