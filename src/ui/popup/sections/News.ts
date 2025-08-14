@@ -1,50 +1,77 @@
-import { DateTime } from 'luxon';
 import { DemoRssProvider } from '../../../news/providers';
 import { getMessage } from '../../../lib/i18n';
 import type { NewsItem } from '../../../news/types';
-import template from './News.html?raw';
-
 
 const provider = new DemoRssProvider();
 
 /**
- * Renders news items grouped by section.
+ * Renders a news card with simple previous/next navigation.
  */
-export async function render(container: HTMLElement): Promise<void> {
-  container.innerHTML = template;
-  const tabsEl = container.querySelector('#news-tabs') as HTMLDivElement;
-  const listEl = container.querySelector('#news-list') as HTMLUListElement;
-  const emptyEl = container.querySelector('#news-empty') as HTMLDivElement;
-  const tabs = ['mecca', 'medina', 'global'] as const;
-  async function load(section: typeof tabs[number]) {
-    listEl.innerHTML = '';
-    emptyEl.textContent = getMessage('loading');
-    const items: NewsItem[] = await provider.fetchLatest(section);
-    emptyEl.textContent = '';
+export async function render(): Promise<HTMLElement> {
+  const card = document.createElement('div');
+  card.className = 'card';
+  const header = document.createElement('div');
+  header.className = 'card-header';
+  const left = document.createElement('div');
+  left.className = 'left';
+  const icon = document.createElement('span');
+  icon.textContent = '🕌';
+  const title = document.createElement('span');
+  title.textContent = getMessage('religious_news');
+  left.appendChild(icon);
+  left.appendChild(title);
+  const nav = document.createElement('div');
+  const prev = document.createElement('button');
+  prev.textContent = getMessage('nav_prev');
+  const next = document.createElement('button');
+  next.textContent = getMessage('nav_next');
+  nav.appendChild(prev);
+  nav.appendChild(next);
+  header.appendChild(left);
+  header.appendChild(nav);
+  card.appendChild(header);
+  const body = document.createElement('div');
+  card.appendChild(body);
+
+  const sections = ['mecca', 'medina', 'global'] as const;
+  const lists = await Promise.all(sections.map(s => provider.fetchLatest(s)));
+  const items: NewsItem[] = lists.flat();
+  let index = 0;
+
+  function show() {
+    body.innerHTML = '';
     if (!items.length) {
-      emptyEl.textContent = getMessage('news_empty');
+      body.textContent = getMessage('news_empty');
       return;
     }
-
-    items.forEach(i => {
-      const li = document.createElement('li');
-      const a = document.createElement('a');
-      a.textContent = i.title;
-      a.href = i.link;
-      a.target = '_blank';
-      const span = document.createElement('span');
-      const time = DateTime.fromISO(i.publishedAtISO).toRelative();
-      span.textContent = ` (${i.source}, ${time})`;
-      li.appendChild(a);
-      li.appendChild(span);
-      listEl.appendChild(li);
-    });
+    const item = items[index];
+    const wrap = document.createElement('div');
+    wrap.className = 'news-item';
+    const thumb = document.createElement('div');
+    thumb.className = 'thumb';
+    const text = document.createElement('div');
+    const t = document.createElement('div');
+    t.className = 'title';
+    t.textContent = item.title;
+    const s = document.createElement('div');
+    s.className = 'snippet';
+    s.textContent = item.source;
+    text.appendChild(t);
+    text.appendChild(s);
+    wrap.appendChild(thumb);
+    wrap.appendChild(text);
+    body.appendChild(wrap);
   }
-  tabs.forEach(t => {
-    const btn = tabsEl.querySelector(`button[data-sec="${t}"]`)!;
-    btn.textContent = getMessage(`news_${t}`);
-    btn.onclick = () => load(t);
-  });
 
-  load('mecca');
+  prev.onclick = () => {
+    index = (index - 1 + items.length) % items.length;
+    show();
+  };
+  next.onclick = () => {
+    index = (index + 1) % items.length;
+    show();
+  };
+
+  show();
+  return card;
 }

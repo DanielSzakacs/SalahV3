@@ -1,21 +1,26 @@
 import { getSettings } from '../../../lib/storage';
 import { getMessage } from '../../../lib/i18n';
-import template from './Live.html?raw';
-
 
 /**
- * Renders live stream iframe if URL is configured.
+ * Renders live stream card with configured iframe.
  */
-export async function render(container: HTMLElement): Promise<void> {
-  container.innerHTML = template;
-  const frame = container.querySelector('#live-container') as HTMLDivElement;
-  const hint = container.querySelector('#live-hint') as HTMLDivElement;
+export async function render(): Promise<HTMLElement> {
+  const card = document.createElement('div');
+  card.className = 'card';
+  const header = document.createElement('div');
+  header.className = 'card-header';
+  const title = document.createElement('span');
+  title.textContent = getMessage('live_from_makkah');
+  header.appendChild(title);
+  card.appendChild(header);
+  const body = document.createElement('div');
   const settings = await getSettings();
   const url = settings.liveStreamUrl;
   if (url) {
-    frame.innerHTML = `<iframe width="100%" height="200" src="${url}" frameborder="0" allowfullscreen></iframe>`;
+    body.innerHTML = `<iframe width="100%" height="200" src="${url}" frameborder="0" allowfullscreen></iframe>`;
   } else {
-    hint.textContent = getMessage('live_hint');
-
+    body.textContent = getMessage('no_live_stream');
   }
+  card.appendChild(body);
+  return card;
 }
