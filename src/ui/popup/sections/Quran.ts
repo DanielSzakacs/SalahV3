@@ -1,46 +1,37 @@
 import { LocalSampleProvider } from '../../../quran/providers';
 import { getSettings, setSettings } from '../../../lib/storage';
-import { getMessage } from '../../../lib/i18n';
+import template from './Quran.html?raw';
+
 
 const provider = new LocalSampleProvider();
 
 /**
  * Renders a simple Quran reader using local sample data.
  */
-export async function render(container: HTMLElement) {
+export async function render(container: HTMLElement): Promise<void> {
   const settings = await getSettings();
   const fontSize = settings.quranFontSize || 16;
-  const surahs = await provider.listSurahs();
-  const left = document.createElement('div');
-  const right = document.createElement('div');
-  left.style.width = '40%';
-  left.style.float = 'left';
-  right.style.width = '60%';
-  right.style.float = 'left';
-
-  surahs.forEach(s => {
-    const btn = document.createElement('div');
-    btn.textContent = s.name;
-    btn.style.cursor = 'pointer';
-    btn.onclick = async () => {
-      const data = await provider.getSurah(s.id);
-      right.innerHTML = data.ayat
-        .map(a => `<div style="font-size:${fontSize}px">${a.number}. ${a.text}</div>`) 
-        .join('');
-    };
-    left.appendChild(btn);
-  });
-
-  const slider = document.createElement('input');
-  slider.type = 'range';
-  slider.min = '12';
-  slider.max = '36';
+  container.innerHTML = template;
+  const listEl = container.querySelector('#surah-list') as HTMLUListElement;
+  const contentEl = container.querySelector('#surah-content') as HTMLDivElement;
+  const slider = container.querySelector('#font-size') as HTMLInputElement;
   slider.value = String(fontSize);
   slider.oninput = async e => {
     const v = parseInt((e.target as HTMLInputElement).value, 10);
     await setSettings({ quranFontSize: v });
+    contentEl.style.fontSize = `${v}px`;
   };
-  container.appendChild(slider);
-  container.appendChild(left);
-  container.appendChild(right);
+  const surahs = await provider.listSurahs();
+  surahs.forEach(s => {
+    const li = document.createElement('li');
+    li.textContent = s.name;
+    li.style.cursor = 'pointer';
+    li.onclick = async () => {
+      const data = await provider.getSurah(s.id);
+      contentEl.innerHTML = data.ayat.map(a => `<div>${a.number}. ${a.text}</div>`).join('');
+      contentEl.style.fontSize = `${slider.value}px`;
+    };
+    listEl.appendChild(li);
+  });
+
 }

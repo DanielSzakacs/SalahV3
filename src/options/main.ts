@@ -1,6 +1,8 @@
 import { getSettings, setSettings, getLocation, setLocation, getNotificationPrefs } from '../lib/storage';
 import { getCurrentPosition } from '../lib/geo';
 import { getMessage } from '../lib/i18n';
+import { applyStyles } from '../ui/style';
+
 
 const methods = ['MWL', 'UmmAlQura', 'ISNA'];
 const madhabs = ['Shafi', 'Hanafi'];
@@ -12,6 +14,7 @@ const languages = ['en', 'hu', 'ar', 'tr', 'ur'];
  * Renders the options page and wires simple settings bindings.
  */
 async function init() {
+  applyStyles();
   const app = document.getElementById('app')!;
   const settings = await getSettings();
   const loc = await getLocation();

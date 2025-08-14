@@ -1,5 +1,7 @@
 import { DateTime } from 'luxon';
 import { getMessage } from '../../../lib/i18n';
+import template from './Daily.html?raw';
+
 
 const messages = [
   'Actions are judged by intentions. (Bukhari)',
@@ -19,18 +21,19 @@ let offset = 0;
 /**
  * Shows a daily rotating inspirational message.
  */
-export function render(container: HTMLElement) {
+export function render(container: HTMLElement): void {
+  container.innerHTML = template;
+  const msgEl = container.querySelector('#daily-message') as HTMLDivElement;
+  const btn = container.querySelector('#daily-next') as HTMLButtonElement;
+  btn.textContent = getMessage('daily_next');
   function show() {
     const index = (DateTime.now().ordinal + offset) % messages.length;
-    container.textContent = messages[index];
+    msgEl.textContent = messages[index];
   }
-  const btn = document.createElement('button');
-  btn.textContent = getMessage('daily_next');
+
   btn.onclick = () => {
     offset++;
     show();
   };
-  container.innerHTML = '';
-  container.appendChild(btn);
   show();
 }
