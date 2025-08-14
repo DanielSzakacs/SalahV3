@@ -9,6 +9,7 @@ import { getMessage, setLanguage } from '../../../lib/i18n';
 
 /**
  * Renders the in-popup settings panel for location and other options.
+
  * @param onClose callback when panel should be closed
  * @param onSaved callback after location has been saved
  */
@@ -181,6 +182,7 @@ export async function render(
     updateCustomRow();
   });
   updateCustomRow();
+
 
   card.appendChild(form);
   return card;
