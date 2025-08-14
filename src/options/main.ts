@@ -1,112 +1,104 @@
-import { getSettings, setSettings, getLocation, setLocation, getNotificationPrefs } from '../lib/storage';
-import { getCurrentPosition } from '../lib/geo';
-import { getMessage } from '../lib/i18n';
+import { getSettings, setSettings } from '../lib/storage';
+import { setLanguage, getMessage } from '../lib/i18n';
 import { applyStyles } from '../ui/style';
 
+interface AdhanSettings {
+  audioEnabled: boolean;
+  popupEnabled: boolean;
+  source: string;
+  customUrl: string;
+  volume: number;
+}
 
-const methods = ['MWL', 'UmmAlQura', 'ISNA'];
-const madhabs = ['Shafi', 'Hanafi'];
-const latitudeRules = ['MiddleOfTheNight', 'SeventhOfTheNight', 'TwilightAngle'];
-const prayers = ['Fajr', 'Dhuhr', 'Asr', 'Maghrib', 'Isha'];
-const languages = ['en', 'hu', 'ar', 'tr', 'ur'];
+const languages = ['en', 'hu', 'ru', 'ar', 'tr', 'ur'];
+const adhanSources = [
+  { id: 'silent', key: 'opt_silent', url: '' },
+  { id: 'makkah', key: 'opt_adhan_src_makkah', url: 'https://cdn.islamic.network/adhan/mp3/1.mp3' },
+  { id: 'medina', key: 'opt_adhan_src_medina', url: 'https://cdn.islamic.network/adhan/mp3/2.mp3' },
+  { id: 'custom', key: 'opt_custom', url: '' }
+];
 
-/**
- * Renders the options page and wires simple settings bindings.
- */
-async function init() {
-  applyStyles();
-  const app = document.getElementById('app')!;
+const defaultAdhan: AdhanSettings = {
+  audioEnabled: false,
+  popupEnabled: true,
+  source: 'silent',
+  customUrl: '',
+  volume: 70
+};
+
+applyStyles();
+
+async function render() {
   const settings = await getSettings();
-  const loc = await getLocation();
-  const notif = await getNotificationPrefs();
-  const src = settings.newsSources || { mecca: [], medina: [], global: [] };
-  app.innerHTML = `
-    <div>
-      <label>${getMessage('opt_method')}
-        <select id="method">${methods.map(m=>`<option value="${m}">${m}</option>`).join('')}</select>
-      </label>
-      <label>${getMessage('opt_madhab')}
-        <select id="madhab">${madhabs.map(m=>`<option value="${m}">${m}</option>`).join('')}</select>
-      </label>
-      <label>${getMessage('opt_latrule')}
-        <select id="latrule">${latitudeRules.map(l=>`<option value="${l}">${l}</option>`).join('')}</select>
-      </label>
-    </div>
-    <div>
-      <label>Lat <input id="lat" value="${loc.lat}"></label>
-      <label>Lon <input id="lon" value="${loc.lon}"></label>
-      <button id="locate">${getMessage('locate_me')}</button>
-    </div>
-    <div id="notifs">
-      ${prayers.map(p=>`<label><input type="checkbox" data-prayer="${p}" ${notif[p] ? 'checked' : ''}/> ${p}</label>`).join('<br/>')}
-    </div>
-    <div>
-      <label>${getMessage('opt_adhan_mode')}
-        <select id="adhanMode">
-          <option value="silent">${getMessage('opt_silent')}</option>
-          <option value="url">URL</option>
-        </select>
-      </label>
-      <label>URL <input id="adhanUrl" value="${settings.adhanUrl || ''}"></label>
-      <label>${getMessage('opt_volume')} <input id="adhanVolume" type="range" min="0" max="1" step="0.1" value="${settings.adhanVolume || 0.7}"></label>
-    </div>
-    <div>
-      <label>News Mecca <textarea id="news_mecca">${src.mecca.join('\n')}</textarea></label>
-      <label>News Medina <textarea id="news_medina">${src.medina.join('\n')}</textarea></label>
-      <label>News Global <textarea id="news_global">${src.global.join('\n')}</textarea></label>
-    </div>
-    <div>
-      <label>Live URL <input id="liveUrl" value="${settings.liveStreamUrl || ''}"></label>
-    </div>
-    <div>
-      <label>${getMessage('opt_language')}
-        <select id="lang">${languages.map(l=>`<option value="${l}">${l}</option>`).join('')}</select>
-      </label>
-    </div>
-    <div>
-      <label>${getMessage('opt_quran_font')} <input id="quranFont" type="range" min="12" max="36" value="${settings.quranFontSize || 16}"></label>
-    </div>
-    <button id="simulate">${getMessage('opt_simulate')}</button>
-  `;
-  (document.getElementById('method') as HTMLSelectElement).value = settings.method || 'MWL';
-  (document.getElementById('madhab') as HTMLSelectElement).value = settings.madhab || 'Shafi';
-  (document.getElementById('latrule') as HTMLSelectElement).value = settings.latitudeRule || 'MiddleOfTheNight';
-  (document.getElementById('adhanMode') as HTMLSelectElement).value = settings.adhanMode || 'silent';
-  (document.getElementById('lang') as HTMLSelectElement).value = settings.language || 'en';
+  const lang = settings.language || 'en';
+  await setLanguage(lang);
+  const adhan: AdhanSettings = { ...defaultAdhan, ...(settings.adhan || {}) };
 
-  document.getElementById('method')!.addEventListener('change', e => setSettings({ method: (e.target as HTMLSelectElement).value }));
-  document.getElementById('madhab')!.addEventListener('change', e => setSettings({ madhab: (e.target as HTMLSelectElement).value }));
-  document.getElementById('latrule')!.addEventListener('change', e => setSettings({ latitudeRule: (e.target as HTMLSelectElement).value }));
-  document.getElementById('lat')!.addEventListener('change', e => setLocation({ lat: parseFloat((e.target as HTMLInputElement).value), lon: loc.lon }));
-  document.getElementById('lon')!.addEventListener('change', e => setLocation({ lat: loc.lat, lon: parseFloat((e.target as HTMLInputElement).value) }));
-  document.querySelectorAll('#notifs input').forEach(el => {
-    el.addEventListener('change', ev => {
-      const t = ev.target as HTMLInputElement;
-      setSettings({ notifications: { ...notif, [t.dataset.prayer!]: t.checked } });
-    });
-  });
-  document.getElementById('adhanMode')!.addEventListener('change', e => setSettings({ adhanMode: (e.target as HTMLSelectElement).value }));
-  document.getElementById('adhanUrl')!.addEventListener('change', e => setSettings({ adhanUrl: (e.target as HTMLInputElement).value }));
-  document.getElementById('adhanVolume')!.addEventListener('input', e => setSettings({ adhanVolume: parseFloat((e.target as HTMLInputElement).value) }));
-  document.getElementById('news_mecca')!.addEventListener('change', e => saveNews('mecca', (e.target as HTMLTextAreaElement).value));
-  document.getElementById('news_medina')!.addEventListener('change', e => saveNews('medina', (e.target as HTMLTextAreaElement).value));
-  document.getElementById('news_global')!.addEventListener('change', e => saveNews('global', (e.target as HTMLTextAreaElement).value));
-  document.getElementById('liveUrl')!.addEventListener('change', e => setSettings({ liveStreamUrl: (e.target as HTMLInputElement).value }));
-  document.getElementById('lang')!.addEventListener('change', e => setSettings({ language: (e.target as HTMLSelectElement).value }));
-  document.getElementById('quranFont')!.addEventListener('input', e => setSettings({ quranFontSize: parseInt((e.target as HTMLInputElement).value, 10) }));
-  document.getElementById('locate')!.addEventListener('click', async () => {
-    const p = await getCurrentPosition();
-    await setLocation(p);
-  });
-  document.getElementById('simulate')!.addEventListener('click', () => {
-    chrome.runtime.sendMessage('simulate');
-  });
+  const langLabel = document.getElementById('lang-label')!;
+  const langSelect = document.getElementById('lang-select') as HTMLSelectElement;
+  langLabel.textContent = getMessage('opt_language');
+  langSelect.innerHTML = languages.map(l => `<option value="${l}">${l}</option>`).join('');
+  langSelect.value = lang;
+
+  const adhanTitle = document.getElementById('adhan-title')!;
+  adhanTitle.textContent = getMessage('opt_adhan_title');
+  const audioEnabled = document.getElementById('audio-enabled') as HTMLInputElement;
+  audioEnabled.checked = adhan.audioEnabled;
+  document.getElementById('audio-label')!.textContent = getMessage('opt_adhan_audio');
+  const popupEnabled = document.getElementById('popup-enabled') as HTMLInputElement;
+  popupEnabled.checked = adhan.popupEnabled;
+  document.getElementById('popup-label')!.textContent = getMessage('opt_adhan_popup');
+
+  const sourceLabel = document.getElementById('source-label')!;
+  sourceLabel.textContent = getMessage('opt_adhan_source');
+  const sourceSelect = document.getElementById('audio-source') as HTMLSelectElement;
+  sourceSelect.innerHTML = adhanSources
+    .map(s => `<option value="${s.id}">${getMessage(s.key)}</option>`)
+    .join('');
+  sourceSelect.value = adhan.source;
+
+  const customRow = document.getElementById('custom-url-row') as HTMLDivElement;
+  customRow.style.display = adhan.source === 'custom' ? 'block' : 'none';
+  document.getElementById('custom-url-label')!.textContent = getMessage('opt_adhan_custom_url');
+  const customInput = document.getElementById('custom-url') as HTMLInputElement;
+  customInput.value = adhan.customUrl;
+
+  const volumeLabel = document.getElementById('volume-label')!;
+  volumeLabel.textContent = getMessage('opt_volume');
+  const volumeRange = document.getElementById('volume-range') as HTMLInputElement;
+  volumeRange.value = String(adhan.volume);
+
+  langSelect.onchange = async e => {
+    const value = (e.target as HTMLSelectElement).value;
+    await setSettings({ language: value });
+    await render();
+  };
+
+  audioEnabled.onchange = async e => {
+    adhan.audioEnabled = (e.target as HTMLInputElement).checked;
+    await setSettings({ adhan });
+  };
+
+  popupEnabled.onchange = async e => {
+    adhan.popupEnabled = (e.target as HTMLInputElement).checked;
+    await setSettings({ adhan });
+  };
+
+  sourceSelect.onchange = async e => {
+    adhan.source = (e.target as HTMLSelectElement).value;
+    await setSettings({ adhan });
+    render();
+  };
+
+  customInput.onchange = async e => {
+    adhan.customUrl = (e.target as HTMLInputElement).value;
+    await setSettings({ adhan });
+  };
+
+  volumeRange.oninput = async e => {
+    adhan.volume = parseInt((e.target as HTMLInputElement).value, 10);
+    await setSettings({ adhan });
+  };
 }
 
-async function saveNews(section: string, value: string) {
-  const current = (await getSettings()).newsSources || { mecca: [], medina: [], global: [] };
-  current[section] = value.split('\n').filter(Boolean);
-  await setSettings({ newsSources: current });
-}
-
-init();
+render();
