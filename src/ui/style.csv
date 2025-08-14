@@ -9,7 +9,7 @@ selector,property,value
 body,font-family,sans-serif
 body,width,400px
 body,height,600px
-body,min-width,400px
+body,min-width,650px
 body,min-height,600px
 body,max-width,400px
 body,max-height,600px
