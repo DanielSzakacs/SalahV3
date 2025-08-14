@@ -2,6 +2,7 @@ import { MockSocialProvider } from '../../../social/mock';
 import { getMessage } from '../../../lib/i18n';
 import template from './Social.html?raw';
 
+
 const provider = new MockSocialProvider();
 
 /**
@@ -24,6 +25,7 @@ export async function render(container: HTMLElement): Promise<void> {
     const msgs = await provider.listMessages();
     messagesEl.innerHTML = msgs.map(m => `<li>${m.from}: ${m.text}</li>`).join('');
   }
+
   btn.onclick = async () => {
     if (input.value) {
       await provider.addIntention(input.value);
@@ -31,5 +33,6 @@ export async function render(container: HTMLElement): Promise<void> {
       await load();
     }
   };
+
   load();
 }

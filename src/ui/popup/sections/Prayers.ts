@@ -5,6 +5,7 @@ import { getCurrentPosition } from '../../../lib/geo';
 import { getMessage } from '../../../lib/i18n';
 import template from './Prayers.html?raw';
 
+
 /**
  * Renders today's prayer times and next prayer countdown.
  */
@@ -17,6 +18,7 @@ export async function render(container: HTMLElement): Promise<void> {
   const list = container.querySelector('#prayer-list') as HTMLUListElement;
   const btn = container.querySelector('#locate-btn') as HTMLButtonElement;
   btn.textContent = getMessage('locate_me');
+
   try {
     const settings = await getSettings();
     const loc = await getLocation();
@@ -25,6 +27,7 @@ export async function render(container: HTMLElement): Promise<void> {
       { method: settings.method, madhab: settings.madhab, latitudeRule: settings.latitudeRule },
       { lat: loc.lat, lon: loc.lon, tz }
     );
+
     prayers.forEach(p => {
       const li = document.createElement('li');
       li.textContent = `${p.name}: ${DateTime.fromISO(p.timeISO).toFormat('HH:mm')}`;
@@ -41,16 +44,19 @@ export async function render(container: HTMLElement): Promise<void> {
       tick();
       setInterval(tick, 1000);
     }
+
     btn.onclick = async () => {
       try {
         const pos = await getCurrentPosition();
         await setLocation(pos);
         await render(container);
+
       } catch {
         alert(getMessage('error_location'));
       }
     };
   } catch {
+
     container.textContent = getMessage('error_generic');
   }
 }

@@ -2,6 +2,7 @@ import { DateTime } from 'luxon';
 import { getMessage } from '../../../lib/i18n';
 import template from './Daily.html?raw';
 
+
 const messages = [
   'Actions are judged by intentions. (Bukhari)',
   'The best of you are those who learn the Quran and teach it. (Bukhari)',
@@ -29,6 +30,7 @@ export function render(container: HTMLElement): void {
     const index = (DateTime.now().ordinal + offset) % messages.length;
     msgEl.textContent = messages[index];
   }
+
   btn.onclick = () => {
     offset++;
     show();

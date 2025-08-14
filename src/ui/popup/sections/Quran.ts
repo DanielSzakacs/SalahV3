@@ -2,6 +2,7 @@ import { LocalSampleProvider } from '../../../quran/providers';
 import { getSettings, setSettings } from '../../../lib/storage';
 import template from './Quran.html?raw';
 
+
 const provider = new LocalSampleProvider();
 
 /**
@@ -32,4 +33,5 @@ export async function render(container: HTMLElement): Promise<void> {
     };
     listEl.appendChild(li);
   });
+
 }

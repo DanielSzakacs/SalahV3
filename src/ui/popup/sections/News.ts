@@ -4,6 +4,7 @@ import { getMessage } from '../../../lib/i18n';
 import type { NewsItem } from '../../../news/types';
 import template from './News.html?raw';
 
+
 const provider = new DemoRssProvider();
 
 /**
@@ -24,6 +25,7 @@ export async function render(container: HTMLElement): Promise<void> {
       emptyEl.textContent = getMessage('news_empty');
       return;
     }
+
     items.forEach(i => {
       const li = document.createElement('li');
       const a = document.createElement('a');
@@ -43,5 +45,6 @@ export async function render(container: HTMLElement): Promise<void> {
     btn.textContent = getMessage(`news_${t}`);
     btn.onclick = () => load(t);
   });
+
   load('mecca');
 }

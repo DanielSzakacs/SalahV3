@@ -3,6 +3,7 @@ import { getCurrentPosition } from '../lib/geo';
 import { getMessage } from '../lib/i18n';
 import { applyStyles } from '../ui/style';
 
+
 const methods = ['MWL', 'UmmAlQura', 'ISNA'];
 const madhabs = ['Shafi', 'Hanafi'];
 const latitudeRules = ['MiddleOfTheNight', 'SeventhOfTheNight', 'TwilightAngle'];

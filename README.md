@@ -11,6 +11,7 @@ npm run dev
 
 Then load the unpacked extension from the `dist` folder in Chrome. UI templates live in `src/ui/popup/sections/*.html` and basic styles are defined in `src/ui/style.csv`.
 
+
 ## Features
 
 - **Prayers** tab shows today's times and the next prayer countdown. Use the "Locate me" button to update location.

@@ -2,6 +2,7 @@ import { getSettings } from '../../../lib/storage';
 import { getMessage } from '../../../lib/i18n';
 import template from './Live.html?raw';
 
+
 /**
  * Renders live stream iframe if URL is configured.
  */
@@ -15,5 +16,6 @@ export async function render(container: HTMLElement): Promise<void> {
     frame.innerHTML = `<iframe width="100%" height="200" src="${url}" frameborder="0" allowfullscreen></iframe>`;
   } else {
     hint.textContent = getMessage('live_hint');
+
   }
 }
