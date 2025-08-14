@@ -68,6 +68,16 @@ async function render() {
   const volumeRange = document.getElementById('volume-range') as HTMLInputElement;
   volumeRange.value = String(adhan.volume);
 
+  const closeBtn = document.getElementById('options-close') as HTMLButtonElement | null;
+  if (closeBtn) {
+    closeBtn.textContent = getMessage('opt_close');
+    closeBtn.onclick = () => {
+      if (window.parent !== window) {
+        window.parent.postMessage({ type: 'close-options' }, '*');
+      }
+    };
+  }
+
   langSelect.onchange = async e => {
     const value = (e.target as HTMLSelectElement).value;
     await setSettings({ language: value });
