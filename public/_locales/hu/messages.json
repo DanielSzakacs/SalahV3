@@ -22,6 +22,8 @@
   "tab_daily": { "message": "Napi" },
   "tab_live": { "message": "Élő" },
   "tab_social": { "message": "Közösség" },
+  "options_button": { "message": "Beállítások" },
+  "opt_close": { "message": "Bezár" },
   "opt_method": { "message": "Módszer" },
   "opt_madhab": { "message": "Madhab" },
   "opt_latrule": { "message": "Szélességi szabály" },

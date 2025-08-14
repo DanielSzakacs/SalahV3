@@ -22,6 +22,8 @@
   "tab_daily": { "message": "Daily" },
   "tab_live": { "message": "Live" },
   "tab_social": { "message": "Social" },
+  "options_button": { "message": "اختیارات" },
+  "opt_close": { "message": "بند کریں" },
   "opt_method": { "message": "Method" },
   "opt_madhab": { "message": "Madhab" },
   "opt_latrule": { "message": "Latitude rule" },
