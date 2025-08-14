@@ -30,5 +30,13 @@
   "opt_volume": { "message": "Volume" },
   "opt_language": { "message": "Language" },
   "opt_quran_font": { "message": "Quran font size" },
-  "opt_simulate": { "message": "Simulate alarm" }
+  "opt_simulate": { "message": "Simulate alarm" },
+  "opt_adhan_title": { "message": "Adhan" },
+  "opt_adhan_audio": { "message": "Play audio" },
+  "opt_adhan_popup": { "message": "Show notification" },
+  "opt_adhan_source": { "message": "Audio source" },
+  "opt_adhan_custom_url": { "message": "Custom URL" },
+  "opt_custom": { "message": "Custom" },
+  "opt_adhan_src_makkah": { "message": "Makkah" },
+  "opt_adhan_src_medina": { "message": "Medina" }
 }

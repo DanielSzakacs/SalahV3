@@ -1,16 +1,12 @@
 /**
- * Plays the adhan from a remote URL at the specified volume.
+ * Plays an Adhan audio from a remote URL.
+ *
+ * @param url Remote audio URL or 'silent' for no playback.
+ * @param volume Playback volume between 0 and 1.
  */
 export async function playAdhan(url: string, volume: number): Promise<void> {
-  if (!url) return;
+  if (!url || url === 'silent') return;
   const audio = new Audio(url);
   audio.volume = volume;
   await audio.play();
-}
-
-/**
- * Silent audio mode placeholder.
- */
-export async function playSilent(): Promise<void> {
-  return Promise.resolve();
 }

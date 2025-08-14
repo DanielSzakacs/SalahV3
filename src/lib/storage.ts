@@ -1,17 +1,31 @@
+export interface AdhanSettings {
+  audioEnabled: boolean;
+  popupEnabled: boolean;
+  source: string;
+  customUrl: string;
+  volume: number;
+}
+
+export interface Settings {
+  language?: string;
+  adhan?: AdhanSettings;
+  [key: string]: any;
+}
+
 /**
  * Reads extension settings from chrome storage.
  */
-export async function getSettings(): Promise<any> {
+export async function getSettings(): Promise<Settings> {
   const { settings } = await chrome.storage.sync.get(['settings']);
-  return settings || {};
+  return (settings || {}) as Settings;
 }
 
 /**
  * Merges and saves partial settings to storage.
  */
-export async function setSettings(partial: any) {
+export async function setSettings(partial: Partial<Settings>): Promise<void> {
   const current = await getSettings();
-  const settings = { ...current, ...partial };
+  const settings = { ...current, ...partial } as Settings;
   await chrome.storage.sync.set({ settings });
 }
 

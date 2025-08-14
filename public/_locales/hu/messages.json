@@ -30,5 +30,13 @@
   "opt_volume": { "message": "Hangerő" },
   "opt_language": { "message": "Nyelv" },
   "opt_quran_font": { "message": "Korán betűméret" },
-  "opt_simulate": { "message": "Riasztás szimulálása" }
+  "opt_simulate": { "message": "Riasztás szimulálása" },
+  "opt_adhan_title": { "message": "Adhan" },
+  "opt_adhan_audio": { "message": "Hang lejátszása" },
+  "opt_adhan_popup": { "message": "Értesítés megjelenítése" },
+  "opt_adhan_source": { "message": "Hangforrás" },
+  "opt_adhan_custom_url": { "message": "Egyéni URL" },
+  "opt_custom": { "message": "Egyéni" },
+  "opt_adhan_src_makkah": { "message": "Mekka" },
+  "opt_adhan_src_medina": { "message": "Medina" }
 }
