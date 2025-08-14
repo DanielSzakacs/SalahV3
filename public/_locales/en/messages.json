@@ -22,6 +22,7 @@
   "tab_daily": { "message": "Daily" },
   "tab_live": { "message": "Live" },
   "tab_social": { "message": "Social" },
+  "options_button": { "message": "Options" },
   "opt_method": { "message": "Method" },
   "opt_madhab": { "message": "Madhab" },
   "opt_latrule": { "message": "Latitude rule" },

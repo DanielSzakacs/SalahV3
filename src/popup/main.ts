@@ -7,6 +7,7 @@ import { render as renderSocial } from '../ui/popup/sections/Social';
 import { setLanguage, getMessage } from '../lib/i18n';
 import { getSettings } from '../lib/storage';
 import { applyStyles } from '../ui/style';
+import { openOptionsPage } from '../lib/options';
 
 
 const sections: Record<string, (el: HTMLElement) => void | Promise<void>> = {
@@ -23,6 +24,10 @@ async function init() {
   await setLanguage(settings.language || 'en');
   const content = document.getElementById('content')!;
   applyStyles();
+
+  const optionsBtn = document.getElementById('options-btn')!;
+  optionsBtn.textContent = getMessage('options_button');
+  optionsBtn.addEventListener('click', openOptionsPage);
 
   document.querySelectorAll('#tab-bar button').forEach(btn => {
     const key = btn.getAttribute('data-tab')!;
