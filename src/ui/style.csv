@@ -1,0 +1,6 @@
+selector,property,value
+body,font-family,sans-serif
+#tab-bar,margin-bottom,8px
+#tab-bar button,margin-right,4px
+ul,list-style,none
+button,margin-top,8px

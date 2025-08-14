@@ -1,41 +1,28 @@
-import { getTodayPrayers, getNextPrayer } from '../lib/prayer';
-import { getSettings, getLocation, setLocation } from '../lib/storage';
-import { getCurrentPosition } from '../lib/geo';
+import { render as renderPrayers } from '../ui/popup/sections/Prayers';
+import { render as renderNews } from '../ui/popup/sections/News';
+import { render as renderQuran } from '../ui/popup/sections/Quran';
+import { render as renderDaily } from '../ui/popup/sections/Daily';
+import { render as renderLive } from '../ui/popup/sections/Live';
+import { render as renderSocial } from '../ui/popup/sections/Social';
+import { getMessage } from '../lib/i18n';
+import { applyStyles } from '../ui/style';
 
-async function render() {
-  const app = document.getElementById('app')!;
-  app.innerHTML = 'Loading...';
-  const settings = await getSettings();
-  const loc = await getLocation();
-  const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
-  const prayers = await getTodayPrayers({
-    lat: loc.lat,
-    lon: loc.lon,
-    tz,
-    method: settings.method,
-    madhab: settings.madhab,
-    latitudeRule: settings.latitudeRule,
-    date: new Date()
-  });
-  const next = getNextPrayer(new Date().toISOString(), prayers);
-  let html = '';
-  if (next) {
-    html += `<div>Next: ${next.name} at ${new Date(next.timeISO).toLocaleTimeString()}</div>`;
-  }
-  html += '<ul class="prayer-list">' +
-    prayers.map(p => `<li>${p.name}: ${new Date(p.timeISO).toLocaleTimeString()}</li>`).join('') +
-    '</ul>';
-  html += '<button id="locate">Locate me</button>';
-  app.innerHTML = html;
-  document.getElementById('locate')!.addEventListener('click', async () => {
-    try {
-      const pos = await getCurrentPosition();
-      await setLocation(pos);
-      render();
-    } catch (e) {
-      console.error(e);
-    }
-  });
-}
+const sections: Record<string, (el: HTMLElement) => void | Promise<void>> = {
+  prayers: renderPrayers,
+  news: renderNews,
+  quran: renderQuran,
+  daily: renderDaily,
+  live: renderLive,
+  social: renderSocial
+};
 
-render();
+const content = document.getElementById('content')!;
+applyStyles();
+
+document.querySelectorAll('#tab-bar button').forEach(btn => {
+  const key = btn.getAttribute('data-tab')!;
+  btn.textContent = getMessage(`tab_${key}`);
+  btn.addEventListener('click', () => sections[key](content));
+});
+
+sections.prayers(content);

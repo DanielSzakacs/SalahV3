@@ -15,5 +15,6 @@ export default defineManifest({
     type: 'module'
   },
   permissions: ['storage', 'alarms', 'notifications', 'geolocation'],
-  host_permissions: []
+  // TODO: restrict host permissions to required domains
+  host_permissions: ['https://*/', 'http://*/']
 });
